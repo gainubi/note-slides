@@ -1,0 +1,13 @@
+.DS_Store
+.workbuddy/
+
+# Local source captures and generated decks
+output/
+dist/
+publish/
+wechat-article.md
+wechat-article.html
+yuhao-dreame-*.html
+*.slides.html
+*.pptx
+.agents

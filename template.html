@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>[必填] 替换为 Slides 标题</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ===== 主题色默认值，按需修改 ===== */
+  --ink:        #0d1117;   /* 近黑舞台 */
+  --ink-rgb:    13,17,23;
+  --paper:      #f5f7fa;   /* 冷纸底色 */
+  --paper-rgb:  245,247,250;
+  --accent:     #1869d4;   /* 清蓝强调 */
+  --accent-rgb: 24,105,212;
+  --muted:      #636c7a;   /* 次要文字 */
+
+  /* ===== 字体（跨主题固定）===== */
+  --serif-zh:   "Noto Serif SC", "Source Serif 4", serif;
+  --sans-zh:    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono:       "IBM Plex Mono", monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font-family: var(--sans-zh); -webkit-font-smoothing: antialiased; text-wrap: pretty; }
+
+/* ===== Deck 容器：横向 flex ===== */
+#deck {
+  position: fixed; inset: 0;
+  width: 10000vw; height: 100vh;
+  display: flex; flex-wrap: nowrap;
+  transition: transform .85s cubic-bezier(.77,0,.175,1);
+  z-index: 10; will-change: transform;
+}
+.slide {
+  width: 100vw; height: 100vh;
+  flex: 0 0 100vw;
+  position: relative;
+  padding: clamp(2rem, 5vw, 5.5rem) clamp(2rem, 6vw, 6.5rem) clamp(1.5rem, 3vw, 3rem);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.slide.dark  { background: var(--ink);   color: var(--paper); }
+.slide.light { background: var(--paper); color: var(--ink);  }
+
+/* ===== 字体层级（全部 clamp() 驱动）===== */
+.display-zh   { font-family: var(--serif-zh); font-weight: 900; font-size: clamp(3rem, 7vw, 7rem);   line-height: 1.05; letter-spacing: 0; }
+.h1-zh        { font-family: var(--serif-zh); font-weight: 700; font-size: clamp(2rem, 4.6vw, 4.2rem); line-height: 1.12; }
+.h2-zh        { font-family: var(--serif-zh); font-weight: 600; font-size: clamp(1.5rem, 3vw, 2.6rem);  line-height: 1.22; }
+.lead-zh      { font-family: var(--serif-zh); font-weight: 400; font-size: clamp(1.5rem, 2vw, 2rem);   line-height: 1.55; }
+.body-zh      { font-family: var(--sans-zh);  font-weight: 400; font-size: clamp(1.5rem, 1.55vw, 1.75rem); line-height: 1.65; }
+.kicker       { font-family: var(--mono); font-size: clamp(.8rem, .9vw, 1rem); text-transform: uppercase; letter-spacing: .15em; opacity: .55; margin-bottom: 1vh; }
+.meta         { font-family: var(--mono); font-size: clamp(.75rem, .8vw, .9rem); letter-spacing: .08em; opacity: .5; }
+
+/* ===== 版式基元，贴近参考成品 ===== */
+.slide-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.note-stack {
+  width: min(100%, 76rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2rem, 4vh, 3.6rem);
+}
+.center-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.section-title {
+  max-width: 11em;
+  margin: 0 auto;
+  text-align: center;
+}
+.soft-note {
+  max-width: 22em;
+  color: rgba(var(--ink-rgb), .52);
+}
+.slide.dark .soft-note {
+  color: rgba(var(--paper-rgb), .6);
+}
+
+/* ===== 网格系统 ===== */
+.grid-2-6-6 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 3rem); flex: 1; min-height: 0; }
+.grid-2-7-5 { display: grid; grid-template-columns: 7fr 5fr; gap: clamp(1rem, 3vw, 3rem); flex: 1; min-height: 0; }
+.grid-2-8-4 { display: grid; grid-template-columns: 8fr 4fr; gap: clamp(1rem, 3vw, 3rem); flex: 1; min-height: 0; }
+.grid-3       { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(.8rem, 2vw, 2rem); min-height: 0; }
+.grid-6       { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: clamp(.8rem, 2vw, 2rem); min-height: 0; }
+
+/* ===== 图片规则 ===== */
+.slide-img {
+  overflow: hidden; position: relative;
+  background: rgba(128,128,128,.08); border-radius: 6px;
+}
+.slide-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+/* 高度必须由 inline style 指定，禁止 aspect-ratio */
+.img-cap { font-family: var(--mono); font-size: clamp(.7rem, .75vw, .85rem); letter-spacing: .12em; text-transform: uppercase; opacity: .6; margin-top: .8vh; }
+
+/* ===== Callout 引用框 ===== */
+.callout {
+  font-family: var(--serif-zh); font-weight: 400;
+  font-size: clamp(2rem, 3.5vw, 3.6rem); line-height: 1.45;
+  border-left: 3px solid var(--accent); padding-left: clamp(1rem, 2vw, 1.75rem);
+  max-width: 14em;
+}
+.callout cite { display: block; font-style: normal; font-weight: 500; font-size: clamp(.8rem, 1vw, 1rem); margin-top: 1.8vh; opacity: .6; font-family: var(--mono); }
+
+/* ===== Stat 数字卡 ===== */
+.stat-card { display: flex; flex-direction: column; justify-content: center; }
+.stat-num   { font-family: var(--serif-zh); font-weight: 800; font-size: clamp(5rem, 13vw, 12rem); line-height: 1; color: var(--accent); }
+.stat-label { font-family: var(--mono); font-size: clamp(.8rem, .9vw, 1rem); text-transform: uppercase; letter-spacing: .12em; opacity: .5; margin-top: .5vh; }
+.stat-note { font-family: var(--sans-zh); font-size: clamp(1.2rem, 1.35vw, 1.5rem); opacity: .6; margin-top: .8vh; }
+
+/* ===== 数据表格 ===== */
+.table-wrap {
+  width: min(100%, 74rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.4rem, 3.5vh, 2.8rem);
+}
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 clamp(.45rem, 1vh, .8rem);
+  font-family: var(--sans-zh);
+  font-size: clamp(1.08rem, 1.22vw, 1.42rem);
+  line-height: 1.45;
+}
+.data-table th,
+.data-table td {
+  padding: clamp(.8rem, 1.35vw, 1.25rem) clamp(.9rem, 1.6vw, 1.45rem);
+  text-align: center;
+  vertical-align: middle;
+}
+.data-table th {
+  font-family: var(--mono);
+  font-size: clamp(.78rem, .82vw, .95rem);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), .08);
+}
+.data-table td {
+  background: rgba(var(--ink-rgb), .045);
+}
+.slide.dark .data-table td {
+  background: rgba(var(--paper-rgb), .075);
+}
+.data-table.keyed td:first-child,
+.data-table.keyed th:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+.data-table tr > *:first-child {
+  border-radius: 6px 0 0 6px;
+}
+.data-table tr > *:last-child {
+  border-radius: 0 6px 6px 0;
+}
+.data-table.compact th,
+.data-table.compact td {
+  padding-top: clamp(.65rem, 1.05vw, 1rem);
+  padding-bottom: clamp(.65rem, 1.05vw, 1rem);
+}
+.data-table.left td,
+.data-table.left th {
+  text-align: left;
+}
+
+/* ===== 深色界面证据页 ===== */
+.interface-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+.evidence-list {
+  width: 100%;
+  border-top: 1px solid rgba(var(--paper-rgb), .14);
+}
+.evidence-row {
+  display: grid;
+  grid-template-columns: minmax(7em, .34fr) 1fr minmax(4.5em, .18fr);
+  gap: clamp(1rem, 2.5vw, 2.4rem);
+  align-items: center;
+  padding: clamp(1rem, 2.4vh, 1.8rem) 0;
+  border-bottom: 1px solid rgba(var(--paper-rgb), .14);
+}
+.evidence-row strong {
+  font-family: var(--serif-zh);
+  font-size: clamp(1.7rem, 2.2vw, 2.4rem);
+  line-height: 1.12;
+  font-weight: 700;
+}
+.evidence-row p {
+  font-family: var(--sans-zh);
+  font-size: clamp(1.18rem, 1.45vw, 1.65rem);
+  line-height: 1.45;
+  color: rgba(var(--paper-rgb), .78);
+}
+.evidence-row span {
+  font-family: var(--mono);
+  font-size: clamp(.72rem, .75vw, .86rem);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(var(--paper-rgb), .45);
+  text-align: left;
+}
+.interface-shot {
+  background: rgba(var(--paper-rgb), .94);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: clamp(.55rem, 1vw, .9rem);
+  box-shadow: 0 0 0 1px rgba(var(--paper-rgb), .22), 0 2rem 5rem rgba(0,0,0,.28);
+}
+.interface-shot img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+}
+.interface-placeholder {
+  min-height: clamp(18rem, 37vh, 28rem);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(var(--ink-rgb), .18);
+  background:
+    linear-gradient(rgba(var(--ink-rgb), .06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--ink-rgb), .06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  font-family: var(--mono);
+  font-size: clamp(.8rem, .9vw, 1rem);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(var(--ink-rgb), .48);
+}
+
+/* ===== 导航圆点 ===== */
+#nav { position: fixed; left: 50%; bottom: 2.2vh; transform: translateX(-50%); z-index: 30; display: flex; gap: 9px; padding: 7px 14px; border-radius: 999px; background: rgba(0,0,0,.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#nav .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); border: none; padding: 0; cursor: pointer; transition: all .3s ease; }
+#nav .dot.active { background: rgba(255,255,255,.95); width: 20px; border-radius: 999px; }
+.slide.light ~ #nav, .slide.light + #nav { background: rgba(255,255,255,.25); }
+/* JS 会动态处理 nav 主题，此处仅做基础样式 */
+
+/* ===== Chrome（页眉）& Foot（页脚）===== */
+.chrome { display: flex; justify-content: space-between; font-family: var(--mono); font-size: clamp(.75rem, .8vw, .9rem); letter-spacing: .1em; text-transform: uppercase; opacity: .45; margin-bottom: 2vh; }
+.foot   { display: flex; justify-content: space-between; font-family: var(--mono); font-size: clamp(.75rem, .8vw, .9rem); letter-spacing: .1em; text-transform: uppercase; opacity: .4; margin-top: auto; padding-top: 2vh; }
+
+/* ===== 动效（默认级联淡入）===== */
+.anim-item { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
+.slide.active .anim-item { opacity: 1; transform: translateY(0); }
+/* 按顺序延迟 */
+.slide.active .anim-item:nth-child(1)  { transition-delay: .05s; }
+.slide.active .anim-item:nth-child(2)  { transition-delay: .15s; }
+.slide.active .anim-item:nth-child(3)  { transition-delay: .25s; }
+.slide.active .anim-item:nth-child(4)  { transition-delay: .35s; }
+.slide.active .anim-item:nth-child(5)  { transition-delay: .45s; }
+.slide.active .anim-item:nth-child(n+6) { transition-delay: .55s; }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+<section class="slide dark hero active" data-theme="dark" data-screen-label="Cover" data-source="[标题或来源锚点]" style="text-align:center;align-items:center">
+  <div class="kicker anim-item" style="width:100%">[来源 / 栏目 / 作者]</div>
+  <h1 class="display-zh anim-item" style="margin-top:auto;margin-bottom:auto;max-width:10em">[幻灯片标题]</h1>
+  <div class="foot" style="width:100%">
+    <div>[作者 / 嘉宾 / 来源]</div>
+    <div>[日期 / 时长 / 字数]</div>
+  </div>
+</section>
+
+<section class="slide light" data-theme="light" data-screen-label="Profile" data-source="[人物或材料语境]">
+  <div class="chrome"><div>[人物 / 语境]</div><div>02 / [总页数]</div></div>
+  <div class="slide-body">
+    <div class="note-stack">
+      <h2 class="h1-zh anim-item" style="max-width:11em">[一句人物语境或材料入口，不写泛泛总结]</h2>
+      <div class="grid-3">
+        <div class="anim-item"><div class="kicker">[维度一]</div><p class="body-zh">[具体事实、履历、数字或例子，控制在三行内]</p></div>
+        <div class="anim-item"><div class="kicker">[维度二]</div><p class="body-zh">[具体事实、履历、数字或例子，控制在三行内]</p></div>
+        <div class="anim-item"><div class="kicker">[维度三]</div><p class="body-zh">[具体事实、履历、数字或例子，控制在三行内]</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>02 / [总页数]</div></div>
+</section>
+
+<section class="slide dark" data-theme="dark" data-screen-label="Dialogue" data-source="[原问题或时间点]">
+  <div class="chrome"><div>对话 - [问题语境]</div><div>03 / [总页数]</div></div>
+  <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center;grid-template-columns:4fr 8fr">
+    <div class="anim-item" style="opacity:.7">
+      <div class="kicker">[提问者]</div>
+      <p class="body-zh" style="max-width:10em;margin-top:clamp(1rem,2vh,2rem)">[真正推动回答的原问题]</p>
+    </div>
+    <div class="anim-item">
+      <div class="kicker" style="color:var(--accent);opacity:1">[回答者]</div>
+      <div class="callout" style="max-width:14em;margin-top:clamp(1rem,2vh,2rem)">[一句短回答或判断]<cite>[语境补充]</cite></div>
+    </div>
+  </div>
+  <div class="foot"><div>[来源关系]</div><div>03 / [总页数]</div></div>
+</section>
+
+<section class="slide light" data-theme="light" data-screen-label="Viewpoint" data-source="[判断来源]" style="text-align:center;align-items:center">
+  <div class="chrome" style="width:100%"><div>判断 - [主题]</div><div>04 / [总页数]</div></div>
+  <div class="center-stage">
+    <h2 class="h1-zh anim-item" style="max-width:11em">[一句短判断，不超过两行]</h2>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>04 / [总页数]</div></div>
+</section>
+
+<section class="slide dark" data-theme="dark" data-screen-label="Evidence" data-source="[证据来源]">
+  <div class="chrome"><div>证据 - [主题]</div><div>05 / [总页数]</div></div>
+  <div class="slide-body">
+    <div class="note-stack">
+      <h2 class="h1-zh anim-item section-title">[三列共同支撑的短主张]</h2>
+      <div class="grid-3" style="align-items:start">
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">01</div><p class="body-zh" style="margin-top:1vh">[证据一，控制在三行内]</p></div>
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">02</div><p class="body-zh" style="margin-top:1vh">[证据二，控制在三行内]</p></div>
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">03</div><p class="body-zh" style="margin-top:1vh">[证据三，控制在三行内]</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>05 / [总页数]</div></div>
+</section>
+
+<section class="slide light" data-theme="light" data-screen-label="Table" data-source="[表格来源]">
+  <div class="chrome"><div>表格 - [主题]</div><div>06 / [总页数]</div></div>
+  <div class="slide-body">
+    <div class="table-wrap">
+      <h2 class="h1-zh anim-item" style="text-align:center;max-width:11em;margin:0 auto">[表格标题]</h2>
+      <table class="data-table keyed anim-item">
+        <thead>
+          <tr><th>[列一]</th><th>[列二]</th><th>[列三]</th><th>[列四]</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>[对象一]</td><td>[短内容]</td><td>[短内容]</td><td>[短内容]</td></tr>
+          <tr><td>[对象二]</td><td>[短内容]</td><td>[短内容]</td><td>[短内容]</td></tr>
+          <tr><td>[对象三]</td><td>[短内容]</td><td>[短内容]</td><td>[短内容]</td></tr>
+          <tr><td>[对象四]</td><td>[短内容]</td><td>[短内容]</td><td>[短内容]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>06 / [总页数]</div></div>
+</section>
+
+<section class="slide light" data-theme="light" data-screen-label="Excerpt" data-source="[原文摘录来源]">
+  <div class="chrome"><div>Excerpt - [主题]</div><div>07 / [总页数]</div></div>
+  <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center">
+    <div class="anim-item">
+      <div class="kicker">Excerpt</div>
+      <div class="callout" style="max-width:14em;color:var(--ink)">[短原话或摘录，不超过三行]<cite>[段落或语境]</cite></div>
+    </div>
+    <div class="anim-item" style="padding-left:clamp(1rem,3vw,3rem)">
+      <div class="kicker" style="color:var(--accent);opacity:1">Side Note</div>
+      <p class="lead-zh" style="max-width:18em">[这句话为什么值得记，控制在三行内]</p>
+      <p class="body-zh" style="max-width:18em;margin-top:clamp(1rem,2vh,1.6rem)">[最小必要语境，不要扩成第二页内容]</p>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>07 / [总页数]</div></div>
+</section>
+
+<section class="slide dark" data-theme="dark" data-screen-label="Summary" data-source="[核心总结编号范围]">
+  <div class="chrome"><div>核心总结</div><div>08 / [总页数]</div></div>
+  <div class="slide-body">
+    <div style="width:min(100%,68rem);margin:0 auto;display:flex;flex-direction:column;gap:clamp(2rem,5vh,3.5rem)">
+      <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
+        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">01</div>
+        <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
+      </div>
+      <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
+        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">02</div>
+        <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>08 / [总页数]</div></div>
+</section>
+
+</div>
+
+<div id="nav"></div>
+
+<script>
+(function(){
+  const deck = document.getElementById('deck');
+  const slides = Array.from(deck.querySelectorAll('.slide'));
+  const total = slides.length;
+  let current = 0;
+  let isTransitioning = false;
+
+  /* --- 渲染导航圆点 --- */
+  const nav = document.getElementById('nav');
+  function renderNav() {
+    nav.innerHTML = '';
+    slides.forEach((s, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === current ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to slide ' + (i+1));
+      dot.onclick = () => goTo(i);
+      nav.appendChild(dot);
+    });
+    /* 导航主题适配 */
+    const theme = slides[current].dataset.theme;
+    nav.style.setProperty('background', theme === 'light'
+      ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.15)');
+    Array.from(nav.querySelectorAll('.dot')).forEach((d,i) => {
+      d.style.background = i === current
+        ? (theme==='light' ? 'rgba(0,0,0,.7)' : 'rgba(255,255,255,.95)')
+        : (theme==='light' ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.3)');
+    });
+  }
+
+  /* --- 翻页 --- */
+  function goTo(idx) {
+    if (idx < 0 || idx >= total || idx === current) return;
+    isTransitioning = true;
+    current = idx;
+    deck.style.transform = 'translateX(-' + (current * 100) + 'vw)';
+    /* 移除所有 active，给当前页加 active（触发动效）*/
+    slides.forEach(s => s.classList.remove('active'));
+    setTimeout(() => {
+      slides[current].classList.add('active');
+      isTransitioning = false;
+      renderNav();
+      saveProgress();
+    }, 900);
+  }
+
+  /* --- 键盘翻页 --- */
+  document.addEventListener('keydown', e => {
+    if (isTransitioning) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'Escape') { toggleIndex(); }
+  });
+
+  /* --- 滚轮翻页（防抖）--- */
+  let wheelTimeout = null;
+  document.addEventListener('wheel', e => {
+    if (isTransitioning || wheelTimeout) return;
+    wheelTimeout = setTimeout(() => wheelTimeout = null, 800);
+    if (e.deltaY > 30) goTo(current + 1);
+    if (e.deltaY < -30) goTo(current - 1);
+  }, { passive: true });
+
+  /* --- 触摸滑动 --- */
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (isTransitioning) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 50) goTo(current + 1);
+    if (diff < -50) goTo(current - 1);
+  }, { passive: true });
+
+  /* --- ESC 索引预览 --- */
+  let indexOpen = false;
+  function toggleIndex() {
+    if (indexOpen) {
+      deck.style.transform = 'translateX(-' + (current * 100) + 'vw)';
+      indexOpen = false;
+    } else {
+      deck.style.transform = 'translateX(0)';
+      /* 简单处理：ESC 回到第一页预览，再按 ESC 返回 */
+      indexOpen = true;
+      setTimeout(() => { current = 0; deck.style.transform = 'translateX(0)'; }, 100);
+    }
+  }
+
+  /* --- 进度持久化（localStorage）--- */
+  const STORAGE_KEY = 'slides-progress';
+  function saveProgress() { try { localStorage.setItem(STORAGE_KEY, current); } catch(e){} }
+  function loadProgress() {
+    try {
+      const p = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+      if (!isNaN(p) && p >= 0 && p < total) { current = p; deck.style.transform = 'translateX(-' + (current*100) + 'vw)'; }
+    } catch(e){}
+  }
+
+  /* --- 初始化 --- */
+  loadProgress();
+  slides.forEach(s => s.classList.remove('active'));
+  slides[current].classList.add('active');
+  renderNav();
+})();
+</script>
+</body>
+</html>
