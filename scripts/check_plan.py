@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from collections import Counter
 import json
 import re
 import sys
@@ -17,6 +18,8 @@ def main():
     slides = plan.get("slides") if isinstance(plan.get("slides"), list) else []
     source_ids = {block["id"] for block in source.get("blocks", [])} if source else set()
     allowed_layouts = {f"L{number}" for number in range(1, 33)}
+    layouts = [str(slide.get("layout", "")).upper() for slide in slides]
+    layout_counts = Counter(layout for layout in layouts if layout)
     errors = []
     warnings = []
     vague_patterns = [
@@ -34,6 +37,15 @@ def main():
         warnings.append(f"Only {len(slides)} slides. Confirm this is intentional.")
     if len(slides) > 40:
         warnings.append(f"Too many slides: {len(slides)}. Consider splitting the deck.")
+    if len(slides) >= 10:
+        minimum_layouts = 6
+        used_layouts = len(set(layouts) - {""})
+        if used_layouts < minimum_layouts:
+            warnings.append(f"Only {used_layouts} distinct layouts. Use at least {minimum_layouts} unless the deck is an intentional series.")
+    if layout_counts["L9"]:
+        allowed_l9 = max(2, min(4, round(len(slides) * 0.12)))
+        if layout_counts["L9"] > allowed_l9:
+            warnings.append(f"L9 appears {layout_counts['L9']} times. Keep title plus three-column pages to about 12 percent of the deck.")
 
     for index, slide in enumerate(slides, start=1):
         label = f"slide {index}"
@@ -67,6 +79,8 @@ def main():
     for index in range(1, len(slides)):
         if slides[index].get("layout") == slides[index - 1].get("layout") and not slides[index].get("series"):
             warnings.append(f"slides {index} and {index + 1}: same layout {slides[index].get('layout')}. Mark series=true if intentional.")
+        if layouts[index] == "L9" and layouts[index - 1] == "L9" and not slides[index].get("series"):
+            warnings.append(f"slides {index} and {index + 1}: consecutive L9 pages. Use L25, L26, L27, L28, L16, or L30 unless this is a true three-part series.")
 
     for index in range(2, len(slides)):
         themes = [theme_of(slides[index - offset]) for offset in [2, 1, 0]]
