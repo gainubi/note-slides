@@ -6,23 +6,20 @@
 
 用于开场。封面结构固定，视觉变量按材料气质调整。
 第一眼看标题，第二眼看来源，第三眼看材料语境。副标题只写来源语境，例如时长、文章类型、访谈对象、作者信息，不写生成者提炼出的中心论点。
-冷静访谈笔记方向下，封面要更像一本严肃笔记的第一页：黑场、居中标题、清蓝小标签、上下 chrome。不要额外加图片、装饰线、卡片或摘要段落。
+冷静访谈笔记方向下，封面要更像一本严肃笔记的第一页：黑场、居中标题、沉静蓝小标签。不要额外加图片、装饰线、卡片或摘要段落。
+
+**chrome**：必须使用 `bare` 类去掉页眉。封面要有真正的封面气质，不应顶着来源、类型和编号的索引头。
+**宽度**：使用 `--w-statement`，让标题、来源标签、副语境形成一个收紧的中心组。
 
 ```html
-<section class="slide dark hero active" data-theme="dark" data-screen-label="Cover" data-source="[标题或来源锚点]" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%">
-    <div>[来源 / 栏目 / 作者]</div>
-    <div>NOTE SLIDES</div>
+<section class="slide dark hero active bare" data-theme="dark" data-screen-label="Cover" data-source="[标题或来源锚点]" style="text-align:center;align-items:center">
+  <div class="slide-body" style="align-items:center">
+    <div class="w-statement" style="display:flex;flex-direction:column;align-items:center;gap:clamp(1.4rem,3vh,2.4rem)">
+      <div class="kicker anim-item" style="color:var(--accent);opacity:1">[材料类型 / 访谈 / 播客 / 长文]</div>
+      <h1 class="display-zh anim-item" style="max-width:9.5em">[主标题]</h1>
+      <p class="lead-zh anim-item" style="max-width:24em;opacity:.62">[一句来源语境，不写总结]</p>
+    </div>
   </div>
-
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateY(-2vh)">
-    <div class="kicker anim-item" style="color:var(--accent);opacity:1">[材料类型 / 访谈 / 播客 / 长文]</div>
-    <h1 class="display-zh anim-item" style="max-width:9.5em;margin-top:clamp(1rem,2vh,1.8rem)">
-      [主标题]
-    </h1>
-    <p class="lead-zh anim-item" style="max-width:24em;margin-top:clamp(1.2rem,3vh,2.4rem);opacity:.68">[一句来源语境，不写总结]</p>
-  </div>
-
   <div class="foot" style="width:100%">
     <div>[作者 / 嘉宾 / 来源]</div>
     <div>[日期 / 时长 / 字数]</div>
@@ -30,27 +27,89 @@
 </section>
 ```
 
-## Layout 3：居中观点
+## Layout 3：居中观点（四亚型）
 
-用于提出核心判断。适合强主张。
+用于提出核心判断。强主张是 deck 的节奏点。同一种强主张版式连续出现太多次，读者会把它当成背景。所以 L3 必须分亚型，避免每页都重复 `max-width:11em + h1-zh + 居中`。
+
+一套 25 到 35 页的 deck 里，强主张通常 4 到 6 页，必须使用至少两种亚型。同一种亚型不要连续两页出现。
+
+### Layout 3-a：社论式
+
+用于真正需要抛出的强判断。display-zh 8vw 撑满，**bare 类去掉 chrome**，使用 `--w-statement` 窄容器。整页只有标签、巨标和（可选）一行 attribution。这是最克制也最锋利的版本。
 
 ```html
-<section class="slide light" data-theme="light" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%">
-    <div>[语境或来源]</div>
-    <div>[页码]</div>
+<section class="slide light bare" data-theme="light">
+  <div class="slide-body" style="align-items:flex-start">
+    <div class="w-statement">
+      <div class="kicker anim-item" style="margin-bottom:clamp(1.6rem,4vh,3rem)">[小标签 / 章节]</div>
+      <h2 class="display-zh anim-item" style="font-size:clamp(3.2rem,8vw,7.6rem);max-width:11em;letter-spacing:0">
+        [一句强主张]
+      </h2>
+    </div>
   </div>
-  <div style="flex:1;display:flex;align-items:center;justify-content:center">
-    <h2 class="h1-zh anim-item" style="max-width:11em">
-      [一句话观点]
-    </h2>
-  </div>
-  <div class="foot" style="width:100%">
-    <div>[页脚左]</div>
-    <div>[页脚右]</div>
-  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>[页码]</div></div>
 </section>
 ```
+
+### Layout 3-b：长句式
+
+用于一句必须读完的长判断（中文 18 到 28 字）。容器拉宽到 `--w-default` 或 `max-width:24em`，标题字号降一档（h1-zh），让长句横排撑满，强迫一行读完。**不要再拉成两行**。
+
+```html
+<section class="slide dark" data-theme="dark" style="text-align:center;align-items:center">
+  <div class="chrome" style="width:100%"><div>[语境或来源]</div><div>[页码]</div></div>
+  <div class="slide-body" style="align-items:center">
+    <h2 class="h1-zh anim-item" style="max-width:24em;font-size:clamp(1.8rem,3.2vw,3rem);line-height:1.35">
+      [一句必须读完的长判断，控制在 18 到 28 个中文字符]
+    </h2>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>[页码]</div></div>
+</section>
+```
+
+### Layout 3-c：上下宣告
+
+用于带上下文的强主张。三段中线对齐：kicker → 大判断 → 一行注解。容器用 `--w-note`，标题用 `h1-zh`，注解必须真的补足理解，不写空泛的本节讨论之类的话。
+
+```html
+<section class="slide dark" data-theme="dark" style="text-align:center;align-items:center">
+  <div class="chrome" style="width:100%"><div>判断 · [主题]</div><div>[页码]</div></div>
+  <div class="slide-body" style="align-items:center">
+    <div class="w-note" style="display:flex;flex-direction:column;align-items:center;gap:clamp(1.4rem,3.5vh,2.6rem)">
+      <div class="kicker anim-item">[标签 / 转场]</div>
+      <h2 class="h1-zh anim-item" style="max-width:13em">[一句短判断，不超过两行]</h2>
+      <p class="body-zh anim-item" style="max-width:22em;opacity:.62">[补一行最小必要解释，不要扩成第二页内容]</p>
+    </div>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>[页码]</div></div>
+</section>
+```
+
+### Layout 3-d：偏置式
+
+用于打破对称的转场判断。**bare 去掉 chrome**，标题贴左下（`slide-body bottom`），右上保留巨大负空间。
+
+整套 deck 里这种亚型**最多用 1 页**。它是默认垂直居中之外的明确例外，多用就会稀释破对称的语义，反而让整本 deck 显得不稳定。如果 deck 里没有真正的换章节或密集证据之后的视觉换气语境，可以完全不用 L3-d。
+
+```html
+<section class="slide dark bare" data-theme="dark">
+  <div class="slide-body bottom" style="align-items:flex-start">
+    <div class="w-statement">
+      <div class="kicker anim-item" style="color:var(--accent);opacity:1;margin-bottom:clamp(1.4rem,3vh,2.4rem)">[小标签]</div>
+      <h2 class="h1-zh anim-item" style="max-width:13em">[一句转场判断]</h2>
+    </div>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>[页码]</div></div>
+</section>
+```
+
+### L3 通用规则
+
+1. 一套 deck 出现的 L3 强主张必须使用至少两种亚型。
+2. 同一种亚型不要连续两页出现。
+3. L3-a 和 L3-d 必须使用 `bare` 类去掉 chrome。L3-b 和 L3-c 保留 chrome。
+4. L3-a / L3-b / L3-c / L3-d 都不允许在标题之外接三列、表格或长段解释。需要解释就改用 L5、L6 或拆页。
+5. 强主张不允许使用 `--w-default` 或 `--w-wide`。这是 deck 的节奏点，必须收窄到 `--w-quote`、`--w-statement` 或 `--w-note`。
 
 ## Layout 4：观点加解释
 
@@ -232,20 +291,22 @@
 用于访谈中的嘉宾金句。居中呈现观点，底部保留嘉宾身份和语境。
 只适合短判断，不适合长段原话。中文超过 36 个字，或视觉上超过三行，就不要用居中大字。
 
+**签章**：必须使用 `guest-mark` 类。标题前一根 4em 1px 短水平细线（accent 65% 透明），是 deck 里嘉宾观点页的视觉指纹。
+**chrome**：必须用 `bare` 类去掉页眉。嘉宾观点是沉浸页，不应该顶着 Guest View 和主题的索引头。
+**宽度**：使用 `--w-quote`（极窄），让短判断有戏剧性的孤立感。
+
 ```html
-<section class="slide dark" data-theme="dark" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%">
-    <div>[语境或来源]</div>
-    <div>[页码]</div>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
-    <div class="kicker anim-item">Guest View</div>
-    <h2 class="h1-zh anim-item" style="max-width:12em;margin-top:clamp(1rem,3vh,2.5rem)">
-      [嘉宾一句掷地有声的话]
-    </h2>
-    <p class="body-zh anim-item" style="max-width:22em;margin-top:clamp(1rem,3vh,2.5rem);opacity:.65">
-      [嘉宾名] · [这句话出现的语境]
-    </p>
+<section class="slide dark bare" data-theme="dark">
+  <div class="slide-body" style="align-items:center;text-align:center">
+    <div class="w-quote guest-mark">
+      <div class="kicker anim-item" style="margin-bottom:clamp(1rem,2vh,1.6rem)">Guest View</div>
+      <h2 class="h1-zh anim-item" style="max-width:12em">
+        [嘉宾一句掷地有声的话]
+      </h2>
+      <p class="body-zh anim-item" style="max-width:22em;margin:clamp(1.6rem,3.5vh,2.6rem) auto 0;opacity:.62">
+        [嘉宾名] · [这句话出现的语境]
+      </p>
+    </div>
   </div>
   <div class="foot" style="width:100%">
     <div>[页脚左]</div>
@@ -313,19 +374,25 @@
 
 用于访谈、历史、项目过程。最多四个节点。
 
+**签章**：使用 `timeline-row` 包裹节点容器，节点本身加 `timeline-node` 类。节点之间会出现一根极淡 1px 水平连接线，是 deck 里时间线页的视觉指纹。这条线全 deck 只属于时间线和文章脉络（L29），其他页型不要使用。
+**宽度**：使用 `--w-wide`（92rem），强调时间的展开感。
+**基线**：默认垂直居中。整页内容（标题加时间轴）作为一个整体落在画面中段。
+
 ```html
 <section class="slide light" data-theme="light">
   <div class="chrome">
     <div>[语境或来源]</div>
     <div>[页码]</div>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
-    <h2 class="h1-zh anim-item" style="max-width:10em;margin-bottom:clamp(2rem,5vh,4rem)">[时间线标题]</h2>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,2rem)">
-      <div class="anim-item" style="padding-top:clamp(.5rem,1vh,1rem)"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
-      <div class="anim-item" style="padding-top:clamp(.5rem,1vh,1rem)"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
-      <div class="anim-item" style="padding-top:clamp(.5rem,1vh,1rem)"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
-      <div class="anim-item" style="padding-top:clamp(.5rem,1vh,1rem)"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+  <div class="slide-body">
+    <div class="w-wide">
+      <h2 class="h1-zh anim-item" style="text-align:center;max-width:13em;margin:0 auto clamp(2rem,5vh,4rem)">[时间线标题]</h2>
+      <div class="timeline-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,2rem)">
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+      </div>
     </div>
   </div>
   <div class="foot">
@@ -485,16 +552,19 @@
 ## Layout 21：结尾回扣
 
 用于收束。居中，回扣开场，不写空泛感谢。
-结尾不需要强行写成"金句"，更重要的是清楚、直接，并能把整套 deck 的判断落下来。
+结尾不需要强行写成金句，更重要的是清楚、直接，并能把整套 deck 的判断落下来。
 默认优先使用更克制的停留页格式：单一主标题层级即可，不额外悬挂标签或装饰层。
 只有当主标题不足以闭环，且补一句确实能显著增强理解时，才允许加一行副说明。
-停留页不等于竖向海报。默认保持横向阅读重心，避免为了"有设计感"把结尾标题框收得过窄，或手动插入 `<br>` 造成生硬断句。
+停留页不等于竖向海报。默认保持横向阅读重心，避免为了显得有设计感把结尾标题框收得过窄，或手动插入 `<br>` 造成生硬断句。
+
+**chrome**：使用 `bare` 类去掉页眉。
+**宽度**：使用 `--w-statement`，与封面形成对称呼应。
 
 ```html
-<section class="slide dark hero" data-theme="dark" style="text-align:center;align-items:center">
-  <div style="flex:1;display:flex;align-items:center;justify-content:center">
-    <div style="max-width:16em;text-align:center">
-      <h2 class="h1-zh anim-item">[回扣开场的结论]</h2>
+<section class="slide dark hero bare" data-theme="dark">
+  <div class="slide-body" style="align-items:center;text-align:center">
+    <div class="w-statement">
+      <h2 class="h1-zh anim-item" style="max-width:16em;margin:0 auto">[回扣开场的结论]</h2>
     </div>
   </div>
   <div class="foot" style="width:100%">

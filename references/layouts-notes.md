@@ -43,6 +43,10 @@
 它比普通引用页更像读书笔记，不负责制造气势，负责保留原句和阅读痕迹。
 如果摘录超过 36 个中文字符，必须使用这个降级版式或拆页，不要把长摘录放成居中大号原话。
 
+**签章**：必须在 callout 上加 `callout-mark` 类。它会去掉原本的左侧蓝条，改成 callout 上方一个 6mm 实心小方块，是 deck 里摘录页的视觉指纹。
+**chrome**：保留，写明 Excerpt · 主题用于索引。
+**宽度**：保持 `grid-2-6-6` 默认 76rem，但左侧 callout 不超过 14em，右侧侧注不超过 18em，让中间的留白成为两块内容的呼吸。
+
 ```html
 <section class="slide light" data-theme="light">
   <div class="chrome">
@@ -52,7 +56,7 @@
   <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center">
     <div class="anim-item">
       <div class="kicker">Excerpt</div>
-      <div class="callout" style="max-width:14em;color:var(--ink);background:rgba(var(--ink-rgb),.05)">
+      <div class="callout callout-mark" style="max-width:14em;color:var(--ink);margin-top:clamp(1rem,2vh,1.6rem)">
         [原文摘录]
         <cite>[段落或语境]</cite>
       </div>
@@ -75,6 +79,8 @@
 用于一段高密度文字。上面放段落重点，下面拆成三层，例如事实、重点、余味。
 适合人物稿、评论文、长访谈和深度报道。
 
+**基线**：默认垂直居中。整页内容（标题加三列拆解）作为一个整体落在画面中段，标题在内容组上方，三列拆解在标题下方。不要让标题孤立漂在顶部。
+
 ```html
 <section class="slide dark" data-theme="dark">
   <div class="chrome">
@@ -83,19 +89,19 @@
   </div>
   <div class="slide-body">
     <div class="note-stack">
-      <h2 class="h1-zh anim-item section-title">[这一段最值得记的一句话]</h2>
+      <h2 class="h1-zh anim-item" style="max-width:13em">[这一段最值得记的一句话]</h2>
       <div class="grid-3">
         <div class="anim-item">
           <div class="meta" style="color:var(--accent);opacity:1">Fact</div>
-          <p class="body-zh">[这一段先讲了什么事实或场景]</p>
+          <p class="body-zh" style="margin-top:1vh">[这一段先讲了什么事实或场景]</p>
         </div>
         <div class="anim-item">
           <div class="meta" style="color:var(--accent);opacity:1">Point</div>
-          <p class="body-zh">[真正推进理解的重点]</p>
+          <p class="body-zh" style="margin-top:1vh">[真正推进理解的重点]</p>
         </div>
         <div class="anim-item">
           <div class="meta" style="color:var(--accent);opacity:1">Aftertaste</div>
-          <p class="body-zh">[它为什么会留在读者脑子里]</p>
+          <p class="body-zh" style="margin-top:1vh">[它为什么会留在读者脑子里]</p>
         </div>
       </div>
     </div>
@@ -189,21 +195,23 @@
 适合播客、人物访谈和评论文章。
 原话必须短，中文不超过 28 个字。超过 28 个字时，不要再接三层注解，改用 Layout 24 或拆成两页。
 
+**签章**：在 callout 上使用 `callout-mark` 类（与 L24 复用同一指纹）。上方 6mm 小方块替代左侧蓝条。
+**chrome**：使用 `bare` 类去掉页眉。沉浸式原话页不应顶着索引头。
+**宽度**：原话 callout 用 `--w-quote`，下方三列注解用 `--w-default`，形成上窄下宽的呼应。
+
 ```html
-<section class="slide dark" data-theme="dark" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%">
-    <div>[说话者或来源]</div>
-    <div>[页码]</div>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
-    <div class="callout anim-item" style="max-width:16em">
-      [一句原话]
-      <cite>[说话者] · [语境]</cite>
+<section class="slide dark bare" data-theme="dark" style="text-align:center">
+  <div class="slide-body" style="align-items:center">
+    <div class="w-quote">
+      <div class="callout callout-mark anim-item" style="max-width:16em;margin:0 auto;text-align:left">
+        [一句原话]
+        <cite>[说话者] · [语境]</cite>
+      </div>
     </div>
-    <div class="grid-3" style="width:min(100%,72rem);margin-top:clamp(2rem,4vh,3rem);text-align:left">
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">回应</div><p class="body-zh">[它回应了哪个问题]</p></div>
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">重点</div><p class="body-zh">[它真正推进了什么理解]</p></div>
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">余味</div><p class="body-zh">[为什么这句话会留下来]</p></div>
+    <div class="w-default" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(.8rem,2vw,2rem);margin-top:clamp(2rem,4vh,3rem);text-align:left">
+      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">回应</div><p class="body-zh" style="margin-top:1vh">[它回应了哪个问题]</p></div>
+      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">重点</div><p class="body-zh" style="margin-top:1vh">[它真正推进了什么理解]</p></div>
+      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">余味</div><p class="body-zh" style="margin-top:1vh">[为什么这句话会留下来]</p></div>
     </div>
   </div>
   <div class="foot" style="width:100%">
@@ -218,19 +226,25 @@
 不是目录页。用于交代一篇长文章或一段长谈是如何往前推进的。
 重点是帮助观众理解推进顺序，不是展示章节名。
 
+**签章**：使用 `timeline-row thick` 包裹起点→落点四节点，节点加 `timeline-node` 类。节点之间会出现一根 1.5px 的连接线（比 L14 时间线略粗一档），强调脉络的连续推进。
+**宽度**：使用 `--w-wide`，让起点和落点之间真的有展开感。
+**基线**：默认垂直居中。
+
 ```html
 <section class="slide light" data-theme="light">
   <div class="chrome">
     <div>[篇名或主题]</div>
     <div>[页码]</div>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
-    <h2 class="h1-zh anim-item" style="text-align:center;max-width:11em;margin:0 auto clamp(2rem,4vh,3.5rem)">[这篇材料是怎么往前推进的]</h2>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,2rem)">
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">起点</div><p class="body-zh">[从哪里进入]</p></div>
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">展开</div><p class="body-zh">[重点怎么被打开]</p></div>
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">转折</div><p class="body-zh">[哪里发生变化]</p></div>
-      <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">落点</div><p class="body-zh">[最后停在哪里]</p></div>
+  <div class="slide-body">
+    <div class="w-wide">
+      <h2 class="h1-zh anim-item" style="text-align:center;max-width:13em;margin:0 auto clamp(2rem,4vh,3.5rem)">[这篇材料是怎么往前推进的]</h2>
+      <div class="timeline-row thick" style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,2rem)">
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">起点</div><p class="body-zh" style="margin-top:1vh">[从哪里进入]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">展开</div><p class="body-zh" style="margin-top:1vh">[重点怎么被打开]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">转折</div><p class="body-zh" style="margin-top:1vh">[哪里发生变化]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">落点</div><p class="body-zh" style="margin-top:1vh">[最后停在哪里]</p></div>
+      </div>
     </div>
   </div>
   <div class="foot">
@@ -274,19 +288,20 @@
 用于材料最后留下的问题、悬而未决的地方、下一步值得继续看的方向。
 它不是总结页，也不负责上价值。
 
+**chrome**：使用 `bare` 类去掉页眉。这是 deck 收束前的沉浸页，不应顶着来源和编号的索引头。
+**宽度**：使用 `--w-quote`，让悬而未决的问题真的有留白等待的感觉。
+
 ```html
-<section class="slide light" data-theme="light" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%">
-    <div>[来源或主题]</div>
-    <div>[页码]</div>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
-    <div class="kicker anim-item">Open Questions</div>
-    <h2 class="h1-zh anim-item" style="max-width:10em;margin-top:clamp(1rem,3vh,2rem)">[材料停下来的地方]</h2>
-    <div style="margin-top:clamp(2rem,4vh,3rem);display:grid;gap:clamp(.8rem,1.5vh,1.2rem);text-align:left;width:min(100%,32rem)">
-      <p class="body-zh anim-item">01 [还没被回答的问题]</p>
-      <p class="body-zh anim-item">02 [后续值得追的线索]</p>
-      <p class="body-zh anim-item">03 [观众会继续带着走的问题]</p>
+<section class="slide light bare" data-theme="light">
+  <div class="slide-body" style="align-items:center;text-align:center">
+    <div class="w-quote">
+      <div class="kicker anim-item">Open Questions</div>
+      <h2 class="h1-zh anim-item" style="max-width:10em;margin:clamp(1rem,3vh,2rem) auto 0">[材料停下来的地方]</h2>
+      <div style="margin-top:clamp(2rem,4vh,3rem);display:grid;gap:clamp(.8rem,1.5vh,1.2rem);text-align:left">
+        <p class="body-zh anim-item">01 [还没被回答的问题]</p>
+        <p class="body-zh anim-item">02 [后续值得追的线索]</p>
+        <p class="body-zh anim-item">03 [观众会继续带着走的问题]</p>
+      </div>
     </div>
   </div>
   <div class="foot" style="width:100%">
@@ -301,20 +316,24 @@
 用于 deck 结尾的高获得感笔记页。每页放二到四条，不写目录，不写口号，不加评论。每条都要来自材料里的具体观点、数字、例子或方法。
 默认使用深色页、大号编号和长段笔记。这个版式适合承载用户要的范文式总结：每条有细节、有获得感、好理解，核心放在嘉宾观点上。不要额外加卡片、边框、引号和装饰图形。
 
+**签章**：编号必须使用 `summary-num` 类。衬线粗体、字号 7vw、accent 色。原模板用等宽字 5vw 让编号变成列表序号，新签章把编号提到衬线粗体大字号，让它成为页面构成元素，是 deck 里核心总结页的视觉指纹。
+**chrome**：简化为只写核心总结 N/M，不再写主题，让连续 3 到 5 页的总结视觉上是一组而不是各自独立的目录页。
+**宽度**：使用 `--w-default`。
+
 ```html
 <section class="slide dark" data-theme="dark" data-screen-label="Summary" data-source="[核心总结编号范围]">
   <div class="chrome">
     <div>核心总结</div>
-    <div>[页码]</div>
+    <div>[页码] / [总页数]</div>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
-    <div style="width:min(100%,68rem);margin:0 auto;display:flex;flex-direction:column;gap:clamp(2rem,5vh,3.5rem)">
+  <div class="slide-body">
+    <div class="w-default" style="display:flex;flex-direction:column;gap:clamp(2rem,5vh,3.5rem)">
       <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
-        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">01</div>
+        <div class="summary-num">01</div>
         <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
       </div>
       <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
-        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">02</div>
+        <div class="summary-num">02</div>
         <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
       </div>
     </div>

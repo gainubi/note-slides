@@ -10,22 +10,31 @@
 <style>
 :root {
   /* ===== 主题色默认值，按需修改 ===== */
-  --ink:        #0d1117;   /* 近黑舞台 */
-  --ink-rgb:    13,17,23;
-  --paper:      #f5f7fa;   /* 冷纸底色 */
-  --paper-rgb:  245,247,250;
-  --accent:     #1869d4;   /* 清蓝强调 */
-  --accent-rgb: 24,105,212;
-  --muted:      #636c7a;   /* 次要文字 */
+  /* 默认配色：克制、柔和、长时间阅读舒适。深色不到纯黑，浅色不到死白。 */
+  --ink:        #1a2332;   /* 深蓝灰舞台（不是纯黑，避免对比过硬）*/
+  --ink-rgb:    26,35,50;
+  --paper:      #faf9f5;   /* 暖一档的 off-white（不是冷蓝灰白）*/
+  --paper-rgb:  250,249,245;
+  --accent:     #2c5fb8;   /* 沉静蓝（饱和度比 1869d4 低一档）*/
+  --accent-rgb: 44,95,184;
+  --muted:      #6b7180;   /* 次要文字 */
 
   /* ===== 字体（跨主题固定）===== */
   --serif-zh:   "Noto Serif SC", "Source Serif 4", serif;
   --sans-zh:    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --mono:       "IBM Plex Mono", monospace;
+
+  /* ===== 容器宽度档位（用于做宽窄节奏，不要全 deck 都用同一档）===== */
+  --w-quote:     min(100%, 48rem);   /* 强主张、嘉宾观点、未解问题、L28 一句原话 */
+  --w-statement: min(100%, 56rem);   /* L3-a 社论式、结尾回扣 */
+  --w-note:      min(100%, 64rem);   /* L3 居中观点、L24 摘录侧注、L5 标题加正文 */
+  --w-default:   min(100%, 76rem);   /* L25 段落拆解、L4/L9 三列证据、L27 观点加例证、L32 核心总结 */
+  --w-wide:      min(100%, 92rem);   /* L14 时间线、L15 流程、L16 表格、L17 矩阵、L29 文章脉络 */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font-family: var(--sans-zh); -webkit-font-smoothing: antialiased; text-wrap: pretty; }
+h1, h2, h3, p, li, blockquote, cite { text-wrap: pretty; }
 
 /* ===== Deck 容器：横向 flex ===== */
 #deck {
@@ -46,13 +55,21 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
 .slide.dark  { background: var(--ink);   color: var(--paper); }
 .slide.light { background: var(--paper); color: var(--ink);  }
 
+/* ===== 沉浸页：去 chrome（封面、L3-a 社论、L11 嘉宾观点、L28 一句原话、L31 未解问题、L21 结尾）===== */
+.slide.bare .chrome { display: none; }
+.slide.bare .foot { opacity: .35; }
+
+/* ===== 不对称基线：标题贴顶 / 标题压底 ===== */
+.slide-body.top    { justify-content: flex-start; padding-top: clamp(2rem, 6vh, 4.5rem); }
+.slide-body.bottom { justify-content: flex-end;   padding-bottom: clamp(2rem, 6vh, 4.5rem); }
+
 /* ===== 字体层级（全部 clamp() 驱动）===== */
-.display-zh   { font-family: var(--serif-zh); font-weight: 900; font-size: clamp(3rem, 7vw, 7rem);   line-height: 1.05; letter-spacing: 0; }
-.h1-zh        { font-family: var(--serif-zh); font-weight: 700; font-size: clamp(2rem, 4.6vw, 4.2rem); line-height: 1.12; }
-.h2-zh        { font-family: var(--serif-zh); font-weight: 600; font-size: clamp(1.5rem, 3vw, 2.6rem);  line-height: 1.22; }
-.lead-zh      { font-family: var(--serif-zh); font-weight: 400; font-size: clamp(1.5rem, 2vw, 2rem);   line-height: 1.55; }
-.body-zh      { font-family: var(--sans-zh);  font-weight: 400; font-size: clamp(1.5rem, 1.55vw, 1.75rem); line-height: 1.65; }
-.kicker       { font-family: var(--mono); font-size: clamp(.8rem, .9vw, 1rem); text-transform: uppercase; letter-spacing: .15em; opacity: .55; margin-bottom: 1vh; }
+.display-zh   { font-family: var(--serif-zh); font-weight: 900; font-size: clamp(3rem, 7vw, 7rem);   line-height: 1.08; letter-spacing: 0; }
+.h1-zh        { font-family: var(--serif-zh); font-weight: 700; font-size: clamp(2rem, 4.6vw, 4.2rem); line-height: 1.18; letter-spacing: 0; }
+.h2-zh        { font-family: var(--serif-zh); font-weight: 600; font-size: clamp(1.5rem, 3vw, 2.6rem);  line-height: 1.28; }
+.lead-zh      { font-family: var(--serif-zh); font-weight: 400; font-size: clamp(1.5rem, 2vw, 2rem);   line-height: 1.5; }
+.body-zh      { font-family: var(--sans-zh);  font-weight: 400; font-size: clamp(1.5rem, 1.55vw, 1.75rem); line-height: 1.55; }
+.kicker       { font-family: var(--mono); font-size: clamp(.8rem, .9vw, 1rem); text-transform: uppercase; letter-spacing: .15em; opacity: .5; margin-bottom: 1vh; }
 .meta         { font-family: var(--mono); font-size: clamp(.75rem, .8vw, .9rem); letter-spacing: .08em; opacity: .5; }
 
 /* ===== 版式基元，贴近参考成品 ===== */
@@ -64,13 +81,20 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
   justify-content: center;
 }
 .note-stack {
-  width: min(100%, 76rem);
+  width: var(--w-default);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: clamp(2rem, 4vh, 3.6rem);
 }
+
+/* ===== 宽度 utility（每个 deck 至少使用三种宽度档位）===== */
+.w-quote     { width: var(--w-quote);     margin-left: auto; margin-right: auto; }
+.w-statement { width: var(--w-statement); margin-left: auto; margin-right: auto; }
+.w-note      { width: var(--w-note);      margin-left: auto; margin-right: auto; }
+.w-default   { width: var(--w-default);   margin-left: auto; margin-right: auto; }
+.w-wide      { width: var(--w-wide);      margin-left: auto; margin-right: auto; }
 .center-stage {
   flex: 1;
   min-height: 0;
@@ -117,6 +141,57 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
 }
 .callout cite { display: block; font-style: normal; font-weight: 500; font-size: clamp(.8rem, 1vw, 1rem); margin-top: 1.8vh; opacity: .6; font-family: var(--mono); }
 
+/* ===== 主线页型签章（visual signature）===== */
+
+/* L11 嘉宾观点：标题前一根 4em 短水平细线（克制，50% 透明度）*/
+.guest-mark { display: flex; flex-direction: column; align-items: center; }
+.guest-mark::before {
+  content:""; display: block;
+  width: clamp(2.4rem, 4em, 4.8rem); height: 1px;
+  background: currentColor; opacity: .35;
+  margin-bottom: clamp(1.4rem, 3vh, 2.4rem);
+}
+
+/* L24 摘录侧注 / L28 一句原话：上方小方块替代左侧蓝条（accent 70% 透明度）*/
+.callout-mark {
+  border-left: none;
+  padding-left: 0;
+  padding-top: clamp(1.6rem, 3vh, 2.4rem);
+  position: relative;
+}
+.callout-mark::before {
+  content:""; position: absolute; top: 0; left: 0;
+  width:  clamp(.5rem, .75vw, .85rem);
+  height: clamp(.5rem, .75vw, .85rem);
+  background: var(--accent); opacity: .7;
+}
+
+/* L14 时间线 / L29 文章脉络：节点之间极淡 1px 连接线 */
+.timeline-row { position: relative; }
+.timeline-row::before {
+  content:""; position: absolute;
+  top: clamp(.85rem, 1.6vh, 1.4rem);
+  left: 6%; right: 6%; height: 1px;
+  background: rgba(var(--ink-rgb), .1);
+  z-index: 0;
+}
+.slide.dark .timeline-row::before { background: rgba(var(--paper-rgb), .1); }
+.timeline-row.thick::before { height: 1.5px; opacity: .8; }
+.timeline-node { position: relative; z-index: 1; }
+.timeline-node .meta { padding-right: clamp(.5rem, 1vw, 1rem); display: inline-block; }
+.slide.light .timeline-node .meta { background: var(--paper); }
+.slide.dark .timeline-node .meta { background: var(--ink); }
+
+/* L32 核心总结：编号字号提升、改用衬线粗体，颜色降一档让数字成为节奏而非视觉焦点 */
+.summary-num {
+  font-family: var(--serif-zh);
+  font-size: clamp(3.2rem, 7vw, 6.4rem);
+  font-weight: 600;
+  color: var(--accent); opacity: .85;
+  line-height: .95;
+  letter-spacing: 0;
+}
+
 /* ===== Stat 数字卡 ===== */
 .stat-card { display: flex; flex-direction: column; justify-content: center; }
 .stat-num   { font-family: var(--serif-zh); font-weight: 800; font-size: clamp(5rem, 13vw, 12rem); line-height: 1; color: var(--accent); }
@@ -125,7 +200,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
 
 /* ===== 数据表格 ===== */
 .table-wrap {
-  width: min(100%, 74rem);
+  width: var(--w-wide);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -277,15 +352,22 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
 
 <div id="deck">
 
-<section class="slide dark hero active" data-theme="dark" data-screen-label="Cover" data-source="[标题或来源锚点]" style="text-align:center;align-items:center">
-  <div class="kicker anim-item" style="width:100%">[来源 / 栏目 / 作者]</div>
-  <h1 class="display-zh anim-item" style="margin-top:auto;margin-bottom:auto;max-width:10em">[幻灯片标题]</h1>
+<!-- 01 封面（L1，bare：去 chrome；窄容器 --w-statement）-->
+<section class="slide dark hero active bare" data-theme="dark" data-screen-label="Cover" data-source="[标题或来源锚点]" style="text-align:center;align-items:center">
+  <div class="slide-body" style="align-items:center">
+    <div class="w-statement" style="display:flex;flex-direction:column;align-items:center;gap:clamp(1.4rem,3vh,2.4rem)">
+      <div class="kicker anim-item" style="color:var(--accent);opacity:1">[材料类型 / 访谈 / 播客 / 长文]</div>
+      <h1 class="display-zh anim-item" style="max-width:9.5em">[幻灯片标题]</h1>
+      <p class="lead-zh anim-item" style="max-width:24em;opacity:.62">[一句来源语境，不写总结]</p>
+    </div>
+  </div>
   <div class="foot" style="width:100%">
     <div>[作者 / 嘉宾 / 来源]</div>
     <div>[日期 / 时长 / 字数]</div>
   </div>
 </section>
 
+<!-- 02 人物语境（L5 三列）-->
 <section class="slide light" data-theme="light" data-screen-label="Profile" data-source="[人物或材料语境]">
   <div class="chrome"><div>[人物 / 语境]</div><div>02 / [总页数]</div></div>
   <div class="slide-body">
@@ -301,8 +383,33 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
   <div class="foot"><div>[来源]</div><div>02 / [总页数]</div></div>
 </section>
 
+<!-- 03 L3-a 社论式观点（bare：去 chrome；display-zh 8vw；--w-statement 窄）-->
+<section class="slide light bare" data-theme="light" data-screen-label="Statement" data-source="[判断来源]">
+  <div class="slide-body" style="align-items:flex-start">
+    <div class="w-statement">
+      <div class="kicker anim-item" style="margin-bottom:clamp(1.6rem,4vh,3rem)">[小标签 / 章节]</div>
+      <h2 class="display-zh anim-item" style="font-size:clamp(3.2rem,8vw,7.6rem);max-width:11em;letter-spacing:0">[一句强主张]</h2>
+    </div>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>03 / [总页数]</div></div>
+</section>
+
+<!-- 04 L3-c 上下宣告（kicker → 大判断 → 两行注解，三段中线对齐）-->
+<section class="slide dark" data-theme="dark" data-screen-label="Statement" data-source="[判断来源]" style="text-align:center;align-items:center">
+  <div class="chrome" style="width:100%"><div>判断 · [主题]</div><div>04 / [总页数]</div></div>
+  <div class="slide-body" style="align-items:center">
+    <div class="w-note" style="display:flex;flex-direction:column;align-items:center;gap:clamp(1.4rem,3.5vh,2.6rem)">
+      <div class="kicker anim-item">[标签 / 转场]</div>
+      <h2 class="h1-zh anim-item" style="max-width:13em">[一句短判断，不超过两行]</h2>
+      <p class="body-zh anim-item" style="max-width:22em;opacity:.62">[补一行最小必要解释，不要扩成第二页内容]</p>
+    </div>
+  </div>
+  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>04 / [总页数]</div></div>
+</section>
+
+<!-- 05 对话（L18，回答方拿主舞台）-->
 <section class="slide dark" data-theme="dark" data-screen-label="Dialogue" data-source="[原问题或时间点]">
-  <div class="chrome"><div>对话 - [问题语境]</div><div>03 / [总页数]</div></div>
+  <div class="chrome"><div>对话 · [问题语境]</div><div>05 / [总页数]</div></div>
   <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center;grid-template-columns:4fr 8fr">
     <div class="anim-item" style="opacity:.7">
       <div class="kicker">[提问者]</div>
@@ -313,34 +420,85 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
       <div class="callout" style="max-width:14em;margin-top:clamp(1rem,2vh,2rem)">[一句短回答或判断]<cite>[语境补充]</cite></div>
     </div>
   </div>
-  <div class="foot"><div>[来源关系]</div><div>03 / [总页数]</div></div>
+  <div class="foot"><div>[来源关系]</div><div>05 / [总页数]</div></div>
 </section>
 
-<section class="slide light" data-theme="light" data-screen-label="Viewpoint" data-source="[判断来源]" style="text-align:center;align-items:center">
-  <div class="chrome" style="width:100%"><div>判断 - [主题]</div><div>04 / [总页数]</div></div>
-  <div class="center-stage">
-    <h2 class="h1-zh anim-item" style="max-width:11em">[一句短判断，不超过两行]</h2>
+<!-- 06 嘉宾观点（L11，bare：去 chrome；guest-mark：标题前一根 4em 短水平细线；--w-quote 极窄）-->
+<section class="slide dark bare" data-theme="dark" data-screen-label="Guest View" data-source="[嘉宾来源]">
+  <div class="slide-body" style="align-items:center;text-align:center">
+    <div class="w-quote guest-mark">
+      <div class="kicker anim-item" style="margin-bottom:clamp(1rem,2vh,1.6rem)">Guest View</div>
+      <h2 class="h1-zh anim-item" style="max-width:12em">[嘉宾一句掷地有声的话]</h2>
+      <p class="body-zh anim-item" style="max-width:22em;margin:clamp(1.6rem,3.5vh,2.6rem) auto 0;opacity:.62">[嘉宾名] · [这句话出现的语境]</p>
+    </div>
   </div>
-  <div class="foot" style="width:100%"><div>[说话者或来源]</div><div>04 / [总页数]</div></div>
+  <div class="foot" style="width:100%"><div>[页脚左]</div><div>06 / [总页数]</div></div>
 </section>
 
-<section class="slide dark" data-theme="dark" data-screen-label="Evidence" data-source="[证据来源]">
-  <div class="chrome"><div>证据 - [主题]</div><div>05 / [总页数]</div></div>
+<!-- 07 段落拆解（L25，默认垂直居中；标题加三列共同形成视觉组）-->
+<section class="slide light" data-theme="light" data-screen-label="Deconstruct" data-source="[原段落锚点]">
+  <div class="chrome"><div>段落拆解 · [主题]</div><div>07 / [总页数]</div></div>
   <div class="slide-body">
     <div class="note-stack">
-      <h2 class="h1-zh anim-item section-title">[三列共同支撑的短主张]</h2>
-      <div class="grid-3" style="align-items:start">
-        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">01</div><p class="body-zh" style="margin-top:1vh">[证据一，控制在三行内]</p></div>
-        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">02</div><p class="body-zh" style="margin-top:1vh">[证据二，控制在三行内]</p></div>
-        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">03</div><p class="body-zh" style="margin-top:1vh">[证据三，控制在三行内]</p></div>
+      <h2 class="h1-zh anim-item" style="max-width:13em">[这一段最值得记的一句话]</h2>
+      <div class="grid-3">
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">Fact</div><p class="body-zh" style="margin-top:1vh">[这一段先讲了什么事实或场景]</p></div>
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">Point</div><p class="body-zh" style="margin-top:1vh">[真正推进理解的重点]</p></div>
+        <div class="anim-item"><div class="meta" style="color:var(--accent);opacity:1">Aftertaste</div><p class="body-zh" style="margin-top:1vh">[它为什么会留在读者脑子里]</p></div>
       </div>
     </div>
   </div>
-  <div class="foot"><div>[来源]</div><div>05 / [总页数]</div></div>
+  <div class="foot"><div>[来源]</div><div>07 / [总页数]</div></div>
 </section>
 
+<!-- 08 摘录侧注（L24，callout-mark：上方 6mm 小方块替代左侧蓝条；--w-note 中宽）-->
+<section class="slide light" data-theme="light" data-screen-label="Excerpt" data-source="[原文摘录来源]">
+  <div class="chrome"><div>Excerpt · [主题]</div><div>08 / [总页数]</div></div>
+  <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center">
+    <div class="anim-item">
+      <div class="kicker">Excerpt</div>
+      <div class="callout callout-mark" style="max-width:14em;color:var(--ink);margin-top:clamp(1rem,2vh,1.6rem)">[短原话或摘录，不超过三行]<cite>[段落或语境]</cite></div>
+    </div>
+    <div class="anim-item" style="padding-left:clamp(1rem,3vw,3rem)">
+      <div class="kicker" style="color:var(--accent);opacity:1">Side Note</div>
+      <p class="lead-zh" style="max-width:18em">[这句话为什么值得记，控制在三行内]</p>
+      <p class="body-zh" style="max-width:18em;margin-top:clamp(1rem,2vh,1.6rem)">[最小必要语境，不要扩成第二页内容]</p>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>08 / [总页数]</div></div>
+</section>
+
+<!-- 09 时间线（L14，默认垂直居中；timeline-row：节点之间一根极淡 1px 连接线；--w-wide 宽容器）-->
+<section class="slide light" data-theme="light" data-screen-label="Timeline" data-source="[时间线锚点]">
+  <div class="chrome"><div>时间线 · [主题]</div><div>09 / [总页数]</div></div>
+  <div class="slide-body">
+    <div class="w-wide">
+      <h2 class="h1-zh anim-item" style="text-align:center;max-width:13em;margin:0 auto clamp(2rem,5vh,4rem)">[时间线标题]</h2>
+      <div class="timeline-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,2rem)">
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+        <div class="timeline-node anim-item"><div class="meta" style="color:var(--accent);opacity:1">[时间]</div><p class="body-zh" style="margin-top:1vh">[事件]</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>[来源]</div><div>09 / [总页数]</div></div>
+</section>
+
+<!-- 10 大数字（L12，裸排，不套容器宽度）-->
+<section class="slide light" data-theme="light" data-screen-label="Data" data-source="[数字来源]" style="text-align:center;align-items:center">
+  <div class="chrome" style="width:100%"><div>数据 · [主题]</div><div>10 / [总页数]</div></div>
+  <div class="slide-body" style="align-items:center">
+    <div class="stat-num anim-item">[数字]</div>
+    <h2 class="h2-zh anim-item" style="max-width:14em;margin-top:clamp(1rem,2vh,2rem)">[这个数字意味着什么]</h2>
+    <p class="body-zh anim-item" style="max-width:22em;margin-top:clamp(.8rem,1.5vh,1.5rem);opacity:.6">[来源或上下文]</p>
+  </div>
+  <div class="foot" style="width:100%"><div>[来源]</div><div>10 / [总页数]</div></div>
+</section>
+
+<!-- 11 表格（L16，--w-wide 宽容器）-->
 <section class="slide light" data-theme="light" data-screen-label="Table" data-source="[表格来源]">
-  <div class="chrome"><div>表格 - [主题]</div><div>06 / [总页数]</div></div>
+  <div class="chrome"><div>表格 · [主题]</div><div>11 / [总页数]</div></div>
   <div class="slide-body">
     <div class="table-wrap">
       <h2 class="h1-zh anim-item" style="text-align:center;max-width:11em;margin:0 auto">[表格标题]</h2>
@@ -357,40 +515,25 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink)
       </table>
     </div>
   </div>
-  <div class="foot"><div>[来源]</div><div>06 / [总页数]</div></div>
+  <div class="foot"><div>[来源]</div><div>11 / [总页数]</div></div>
 </section>
 
-<section class="slide light" data-theme="light" data-screen-label="Excerpt" data-source="[原文摘录来源]">
-  <div class="chrome"><div>Excerpt - [主题]</div><div>07 / [总页数]</div></div>
-  <div class="grid-2-6-6" style="flex:1;min-height:0;align-items:center">
-    <div class="anim-item">
-      <div class="kicker">Excerpt</div>
-      <div class="callout" style="max-width:14em;color:var(--ink)">[短原话或摘录，不超过三行]<cite>[段落或语境]</cite></div>
-    </div>
-    <div class="anim-item" style="padding-left:clamp(1rem,3vw,3rem)">
-      <div class="kicker" style="color:var(--accent);opacity:1">Side Note</div>
-      <p class="lead-zh" style="max-width:18em">[这句话为什么值得记，控制在三行内]</p>
-      <p class="body-zh" style="max-width:18em;margin-top:clamp(1rem,2vh,1.6rem)">[最小必要语境，不要扩成第二页内容]</p>
-    </div>
-  </div>
-  <div class="foot"><div>[来源]</div><div>07 / [总页数]</div></div>
-</section>
-
+<!-- 12 核心总结（L32，summary-num：编号 7vw 衬线粗体；chrome 简化为核心总结 N/M）-->
 <section class="slide dark" data-theme="dark" data-screen-label="Summary" data-source="[核心总结编号范围]">
-  <div class="chrome"><div>核心总结</div><div>08 / [总页数]</div></div>
+  <div class="chrome"><div>核心总结</div><div>12 / [总页数]</div></div>
   <div class="slide-body">
-    <div style="width:min(100%,68rem);margin:0 auto;display:flex;flex-direction:column;gap:clamp(2rem,5vh,3.5rem)">
+    <div class="w-default" style="display:flex;flex-direction:column;gap:clamp(2rem,5vh,3.5rem)">
       <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
-        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">01</div>
+        <div class="summary-num">01</div>
         <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
       </div>
       <div class="anim-item" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:start">
-        <div style="font-family:var(--mono);font-size:clamp(2.5rem,5vw,5rem);font-weight:600;color:var(--accent);line-height:1">02</div>
+        <div class="summary-num">02</div>
         <p class="body-zh">[一条具体、有获得感、能回到材料锚点的长笔记。优先写嘉宾的判断、机制、例子和数字，不写评论]</p>
       </div>
     </div>
   </div>
-  <div class="foot"><div>[来源]</div><div>08 / [总页数]</div></div>
+  <div class="foot"><div>[来源]</div><div>12 / [总页数]</div></div>
 </section>
 
 </div>
