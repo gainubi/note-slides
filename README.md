@@ -1,6 +1,8 @@
 # Note Slides
 
-Note Slides 首先是一个 Codex Skill。它通过 `SKILL.md`、`references/`、`template.html` 和 `scripts/`，约束 AI 如何把访谈、播客、公众号长文、课程稿和复盘材料整理成 HTML 笔记幻灯片。
+Note Slides Skill 是一个把访谈、播客、公众号长文、课程稿和复盘材料整理成 HTML 笔记幻灯片的 AI 工作流技能。
+
+它通过 `SKILL.md`、`references/`、`template.html` 和 `scripts/`，约束 AI 如何理解材料、选择版式、生成页面和完成交付。
 
 这个仓库不是普通模板库，也不是单纯的示例集合。所有规则、布局、脚本和模板都服务于同一个前提：让支持 Skill 的 AI 工具按 Note Slides 的方法工作。
 
