@@ -1,6 +1,6 @@
-# Note Slides
+# Note Slides Skill
 
-Note Slides Skill 是一个把访谈、播客、公众号长文、课程稿和复盘材料整理成 HTML 笔记幻灯片的 AI 工作流技能。
+Note Slides Skill 是一个把访谈、播客、公众号长文、课程稿和复盘材料整理成 HTML 版本笔记幻灯片的 Skill。
 
 它通过 `SKILL.md`、`references/`、`template.html` 和 `scripts/`，约束 AI 如何理解材料、选择版式、生成页面和完成交付。
 
