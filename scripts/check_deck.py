@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 import argparse
+import html as html_lib
 import re
 import sys
 from pathlib import Path
+
+
+QUOTE_MARK_PATTERN = r"[\"“”‘’「」『』]"
+DASH_MARK_PATTERN = r"[—–―]|(?<=\s)-(?=\s)"
 
 
 def main():
@@ -26,7 +31,6 @@ def main():
         r"lorem ipsum",
         r"假数据",
         r"大面积渐变",
-        "\u2014",
     ]
     vague = [
         r"这(篇|期|次).{0,8}(真正|本质|核心)讲的是",
@@ -46,12 +50,15 @@ def main():
         source = attr_value(section, "data-source")
         if not source or re.search(r"\[|必填|TODO", source, flags=re.I):
             errors.append(f"{label}: invalid data-source.")
+        check_copy_punctuation(f"{label}: data-source", source, errors)
+        check_copy_punctuation(f"{label}: data-screen-label", attr_value(section, "data-screen-label"), errors)
         theme = attr_value(section, "data-theme")
         if theme and theme not in ["dark", "light"]:
             warnings.append(f"{label}: uncommon data-theme {theme}.")
     for index, block in enumerate(slide_blocks, start=1):
         label = f"slide {index}"
-        visible = strip_tags(block)
+        visible = normalize_copy(strip_tags(block))
+        check_copy_punctuation(f"{label}: visible copy", visible, errors)
         headings = heading_texts(block)
         callouts = callout_texts(block)
         stat_count = len(re.findall(r"class=[\"'][^\"']*\bstat-num\b", block, flags=re.I))
@@ -87,10 +94,11 @@ def main():
     title = tag_text(html, "title")
     if not title or re.search(r"必填|TODO", title):
         errors.append("Missing or placeholder <title>.")
+    check_copy_punctuation("title", title, errors)
     for pattern in forbidden:
         if re.search(pattern, html, flags=re.I):
             errors.append(f"Forbidden placeholder or wording found: {pattern}")
-    stripped = strip_tags(html)
+    stripped = normalize_copy(strip_tags(html))
     for pattern in vague:
         if re.search(pattern, stripped):
             warnings.append(f"Possible guide wording: {pattern}")
@@ -109,9 +117,6 @@ def main():
         warnings.append("Right-aligned text detected. Content text should be left-aligned or centered except page chrome or numeric table columns.")
     if re.search(r"border-radius\s*:\s*(1[2-9]|[2-9]\d)px", css, flags=re.I):
         warnings.append("Large border-radius detected.")
-    quote_count = len(re.findall(r"[“”\"「」『』]", strip_tags(html)))
-    if sections and quote_count / len(sections) > 4:
-        warnings.append(f"High quote density detected: {quote_count} quote marks across {len(sections)} slides.")
     if len(sections) >= 20 and not re.search(r"核心总结|Core Notes", stripped, flags=re.I):
         warnings.append("Long deck may be missing core summary pages near the end.")
 
@@ -142,11 +147,26 @@ def strip_tags(content):
     return re.sub(r"<[^>]+>", " ", content)
 
 
+def normalize_copy(text):
+    text = html_lib.unescape(text or "")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def check_copy_punctuation(label, text, errors):
+    text = normalize_copy(text)
+    if not text:
+        return
+    if re.search(DASH_MARK_PATTERN, text):
+        errors.append(f"{label}: dash marks are not allowed in visible copy. Use comma, colon, period, or split sentences.")
+    if re.search(QUOTE_MARK_PATTERN, text):
+        errors.append(f"{label}: quote marks are not allowed in visible copy. Use layout, attribution, or data-source instead.")
+
+
 def heading_texts(content):
     results = []
     for matched in re.findall(r"<h[1-3]\b[^>]*>([\s\S]*?)</h[1-3]>", content, flags=re.I):
         text = re.sub(r"<[^>]+>", " ", matched)
-        text = re.sub(r"\s+", "", text)
+        text = re.sub(r"\s+", "", html_lib.unescape(text))
         if text:
             results.append(text)
     return results
@@ -157,7 +177,7 @@ def callout_texts(content):
     for matched in re.findall(r"<(?:div|blockquote)\b[^>]*class=[\"'][^\"']*\bcallout\b[^\"']*[\"'][^>]*>([\s\S]*?)</(?:div|blockquote)>", content, flags=re.I):
         text = re.sub(r"<cite[\s\S]*?</cite>", " ", matched, flags=re.I)
         text = re.sub(r"<[^>]+>", " ", text)
-        text = re.sub(r"\s+", "", text)
+        text = re.sub(r"\s+", "", html_lib.unescape(text))
         if text:
             results.append(text)
     return results

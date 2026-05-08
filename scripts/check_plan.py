@@ -7,6 +7,25 @@ import sys
 from pathlib import Path
 
 
+QUOTE_MARK_PATTERN = r"[\"“”‘’「」『』]"
+DASH_MARK_PATTERN = r"[—–―]|(?<=\s)-(?=\s)"
+TEXT_KEYS = [
+    "point",
+    "anchor",
+    "note",
+    "sourceLabel",
+    "source",
+    "screenLabel",
+    "title",
+    "subtitle",
+    "body",
+    "content",
+    "bullets",
+    "items",
+    "caption",
+]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Check a note slides plan.")
     parser.add_argument("--plan", "-p", default="deck.plan.json")
@@ -69,12 +88,11 @@ def main():
             errors.append(f"{label}: point is required.")
         if not slide.get("anchor"):
             errors.append(f"{label}: anchor is required.")
-        text = " ".join(str(slide.get(key, "")) for key in ["point", "anchor", "note", "sourceLabel"])
+        text = " ".join(collect_text(slide.get(key)) for key in TEXT_KEYS)
         for pattern in vague_patterns:
             if re.search(pattern, text):
                 errors.append(f"{label}: vague guide wording detected: {pattern}")
-        if "\u2014" in text:
-            errors.append(f"{label}: em dash is not allowed.")
+        check_copy_punctuation(label, text, errors)
 
     for index in range(1, len(slides)):
         if slides[index].get("layout") == slides[index - 1].get("layout") and not slides[index].get("series"):
@@ -103,6 +121,23 @@ def read_json(file_path):
 
 def theme_of(slide):
     return slide.get("theme") or slide.get("dataTheme") or ""
+
+
+def collect_text(value):
+    if isinstance(value, str):
+        return value
+    if isinstance(value, list):
+        return " ".join(collect_text(item) for item in value)
+    if isinstance(value, dict):
+        return " ".join(collect_text(item) for item in value.values())
+    return ""
+
+
+def check_copy_punctuation(label, text, errors):
+    if re.search(DASH_MARK_PATTERN, text):
+        errors.append(f"{label}: dash marks are not allowed in slide copy. Use comma, colon, period, or split sentences.")
+    if re.search(QUOTE_MARK_PATTERN, text):
+        errors.append(f"{label}: quote marks are not allowed in slide copy. Use layout, attribution, or source labels instead.")
 
 
 def report(errors, warnings, success_message):
